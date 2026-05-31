@@ -92,3 +92,13 @@ daily-tech-news-agent/
    - 確認 **Ollama** 節點連線至您的本地位址 (預設為 `http://localhost:11434`)。
 4. **啟用管線**:
    確認設定無誤後，點擊右上角的 "Save"，並將右上角的 toggle 切換為 **Active** 啟用工作流。
+
+## 📸 系統截圖與執行結果 (Screenshots & Execution Results)
+
+### n8n 工作流架構
+![n8n Architecture](docs/screenshots/n8n_architecture.png)
+
+### Discord 執行結果展示
+![Discord Output 1](docs/screenshots/discord_output1.png)
+![Discord Output 2](docs/screenshots/discord_output2.png)
+![Discord Output 3](docs/screenshots/discord_output3.png)
