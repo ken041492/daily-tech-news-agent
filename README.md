@@ -30,6 +30,17 @@ daily-tech-news-agent/
 本專案資料管線的設計邏輯分為以下 4 個主要階段：
 1. **觸發與動態路由 (Trigger & Routing)**：Discord Trigger 攔截使用者訊息，擷取 `authorId` 與指令。透過 Switch 節點的條件規則，將如 `!半導體` 等指令路由至特定主題的 RSS 節點群。
 2. **批次聚合與清洗 (Batch ETL Pipeline)**：為避免 LLM 因龐大的非結構化 JSON 陣列產生幻覺 (Hallucination) 或反序列化失敗，系統先透過 `Aggregate` 節點批次攔截 40+ 篇新聞，再透過 `Code (JavaScript)` 節點將關鍵欄位萃取並平坦化為純文字字串上下文。
+   - **Code (JavaScript) 實作範例**：
+     ```javascript
+     // 把複雜的 JSON 陣列轉換成 AI 看得懂的純文字清單
+     const dataArray = $input.first().json.data;
+     
+     const newsList = dataArray.map((item, index) => {
+         return `${index + 1}. 標題: ${item.title}\n連結: ${item.link}\n內容: ${item.contentSnippet}\n---`;
+     }).join('\n');
+     
+     return { json: { text: newsList } };
+     ```
 3. **認知與記憶中樞 (Cognitive & Memory Core)**：`AI Agent` 節點以 Qwen 2.5:7b 為推理大腦，利用 ReAct 框架決定是否觸發 `Wikipedia Tool` 擴充領域知識；同時透過 `Simple Memory` 綁定 Discord `authorId` 變數，實現多租戶狀態隔離 (Multi-tenant State Isolation)。
 4. **呈現層解耦 (Presentation Decoupling)**：將 AI 產出的結構化 Markdown 文本，動態對映至 `Discord Send Message` 的 Embeds 卡片屬性中，達成資料處理與 UI 呈現的完美解耦。
 
