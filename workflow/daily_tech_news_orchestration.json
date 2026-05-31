@@ -1,0 +1,445 @@
+{
+  "name": "Tech_Trend_Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content }}",
+                    "rightValue": "半導體",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "23d23818-5168-4933-888a-18e2f397b530"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c45bfb0c-1049-452a-b5a7-cda34fdde6c7",
+                    "leftValue": "={{ $json.content }}",
+                    "rightValue": "財報",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c08c80e1-91b2-41f2-b68c-67018af65f60",
+                    "leftValue": "={{ $json.content }}",
+                    "rightValue": "IT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        -160
+      ],
+      "id": "e87c6200-41eb-4e3b-8606-95cde6c922df",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "guildIds": [
+          "1509023415783391435"
+        ],
+        "channelIds": [
+          "1509036524153344160"
+        ],
+        "value": "!",
+        "additionalFields": {
+          "externalBotTrigger": false,
+          "attachmentsRequired": false
+        }
+      },
+      "type": "n8n-nodes-discord-trigger.discordTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -144
+      ],
+      "id": "93b9cfc7-b8a1-4320-9aa9-54cfbb01365f",
+      "name": "Discord Trigger",
+      "credentials": {
+        "discordBotTriggerApi": {
+          "id": "WfxiNjpNHsJuPziY",
+          "name": "Discord Bot Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://technews.tw/category/semiconductor/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        -320
+      ],
+      "id": "9a4eb539-302d-49e9-bcab-a66e71c25b46",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "url": "https://technews.tw/category/finance/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        -144
+      ],
+      "id": "7ec9040a-9a56-4cce-ba9a-4ec6d5840f1a",
+      "name": "RSS Read1"
+    },
+    {
+      "parameters": {
+        "url": "https://www.ithome.com.tw/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        48
+      ],
+      "id": "6f15bf83-7a32-4a04-901d-fa9efa53df07",
+      "name": "RSS Read2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "title, contentSnippet, link",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -144
+      ],
+      "id": "e73554e1-5d3c-4453-80a1-680ffb2d9d05",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:7b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        848,
+        64
+      ],
+      "id": "6066cb8f-c490-40a4-8721-aeb76e8b3a59",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Nsn5BKY31yFehRia",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=你是一位資深科技分析師。以下是今天最新的科技新聞原始資料：\n\n{{ $json.text }}\n\n【任務與限制】\n1. 請根據上述「真實且精確的資料」內容，撰寫一份專業的情報日報。當閱讀新聞時，遇到你不熟悉的專業名詞（例如新興技術），你必須先使用 中文 Wikipedia 工具搜尋其定義，並將搜尋到的背景知識融入日報的『延伸影響』分析中！請絕對不要編造！\n2. ⚠️【字體與術語硬性規範】：你必須全程使用「台灣繁體中文（zh-TW）」輸出，嚴禁出現任何一個簡體字。\n3. ⚠️【台灣科技術語轉換】：如果內文涉及科技術語，必須嚴格使用台灣科技業習慣用語。例如：\n   * 嚴禁寫「平臺」，必須寫「平台」\n   * 嚴禁寫「網絡」，必須寫「網路」\n   * 嚴禁寫「數據」，必須寫「資料」\n   * 嚴禁寫「人工智能」，必須寫「人工智慧」\n   * 嚴禁寫「軟件/硬件」，必須寫「軟體/硬體」\n違反以上任何一項規則，整份報告將被視為失敗。\n\n【輸出格式規範】\n請嚴格依照以下格式輸出（使用 Markdown 與 Emoji 排版）：\n\n📅 【[動態主題] 情報日報｜今日板塊總覽】\n(⚠️ 指令：請根據你收到的新聞內容屬性，自動將上方的 [動態主題] 替換成合適的詞彙，例如：半導體、金融財報、IT技術、綜合科技...等)\n\n🔥 一、 重點新聞深度解析（請選出 3 篇最具產業影響力的文章進行分析）\n1. 🚀 **[填入新聞標題]**：\n   * **核心亮點**：(根據內容簡述技術突破或事件重點)\n   * **延伸影響**：(分析這件事對產業圈的影響)\n   * 🔗 原文連結：[點此閱讀](填入link)\n(第2、3篇以此類推...)\n\n🔍 二、 新聞快速掃描（將其他重要的文章條列）\n* 🔗 [填入標題](填入link) - (用一句話總結)\n* 🔗 [填入標題](填入link) - (用一句話總結)\n\n🎯 三、 分析師今日硬核觀點\n(請站在產業制高點，根據今天的全部新聞，給出一句極具前瞻性的總結。)",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        912,
+        -144
+      ],
+      "id": "a9b31be0-411a-4f55-81d3-99c227dd9461",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 把複雜的 JSON 陣列轉換成 AI 看得懂的純文字清單\nconst dataArray = $input.first().json.data;\n\nconst newsList = dataArray.map((item, index) => {\n    return `${index + 1}. 標題: ${item.title}\\n連結: ${item.link}\\n內容: ${item.contentSnippet}\\n---`;\n}).join('\\n');\n\nreturn { json: { text: newsList } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        -144
+      ],
+      "id": "9d4a562e-1a18-469e-841b-68d326ed979a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1509023415783391435",
+          "mode": "list",
+          "cachedResultName": "tech-daily-digest",
+          "cachedResultUrl": "https://discord.com/channels/1509023415783391435"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1509036524153344160",
+          "mode": "list",
+          "cachedResultName": "tech-news-bot",
+          "cachedResultUrl": "https://discord.com/channels/1509023415783391435/1509036524153344160"
+        },
+        "content": "={{ $json.output }}",
+        "options": {},
+        "embeds": {
+          "values": [
+            {
+              "description": "={{ $json.output }}",
+              "author": "TechTrend AI 分析師",
+              "color": "#00FF1E",
+              "title": "={{ $('Discord Trigger').item.json.content.replace('!', '') }} 技術專題情報"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        -144
+      ],
+      "id": "cffdb5de-e84d-4680-9c2b-2d5f6533f1ef",
+      "name": "Send a message",
+      "webhookId": "e71b9241-445e-48ca-ad77-c0a7665dbb61",
+      "credentials": {
+        "discordBotApi": {
+          "id": "jnGctXWpwXfh5dnK",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Discord Trigger').item.json.authorId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        992,
+        64
+      ],
+      "id": "c4211fe3-6d19-4907-bdef-dd04f60322e6",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        64
+      ],
+      "id": "da2bbd8f-d8e9-43c2-acb5-e9a9fe2fbca7",
+      "name": "Wikipedia",
+      "notes": "當科技新聞內文中出現任何專有名詞、惡意程式名稱、資安架構、新興技術、或是你不確定其詳細定義的科技詞彙時，必須調用此工具來搜尋 Wikipedia 以取得詳細的背景知識。"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Discord Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RSS Read1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "RSS Read2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ec2e0ddf-abdc-40c7-8128-6f49c6e491c8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c3e6c84b3f43072b09c82e7732f8e93fcdae02bba81e59faf65e996c7fc6a905"
+  },
+  "id": "1LFhWHVHURWWEXoN",
+  "tags": []
+}
