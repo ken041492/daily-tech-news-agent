@@ -12,6 +12,7 @@
 ```text
 daily-tech-news-agent/
 ├── docs/
+│   ├── daily_tech_news_pipeline.png (系統管線架構)
 │   ├── homework4_report.pdf (書面報告)
 │   └── screenshots/ (系統運行與架構截圖)
 │       ├── agent_topology.png
@@ -105,6 +106,9 @@ daily-tech-news-agent/
    確認設定無誤後，點擊右上角的 "Save"，並將右上角的 toggle 切換為 **Active** 啟用工作流。
 
 ## 📸 系統截圖與執行結果 (Screenshots & Execution Results)
+
+### 系統管線架構 (System Pipeline)
+![System Pipeline](docs/daily_tech_news_pipeline.png)
 
 ### n8n 工作流架構
 ![n8n Architecture](docs/screenshots/n8n_architecture.png)
